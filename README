@@ -1,0 +1,3 @@
+This is demo code for Korg's excellent padKontrol midi controller.
+
+Better documentation to come. For now, see the native_demo.c file for documentation.
