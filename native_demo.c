@@ -44,9 +44,6 @@ TODO:
   - Clean up the code so that it generates less warnings under -Wall
 Related materials:
   
-  Page related to this code:
-  http://comichunter.net/nowhere/pK_native/
-  
   Korg pK SysEx manual (elsewhere referred to as 'the PDF'):
   http://www.thecovertoperators.org/uploads/PadKONTROL%20imp.pdf
   (via) http://www.thecovertoperators.org/
