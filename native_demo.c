@@ -39,9 +39,9 @@ Demo functions:
   Simple 7seg messages on knobs and xy pad.
   
 TODO:
-  Add a function for manipulating individual 7seg LEDs, including the
+  - Add a function for manipulating individual 7seg LEDs, including the
   decimals.
-  
+  - Clean up the code so that it generates less warnings under -Wall
 Related materials:
   
   Page related to this code:

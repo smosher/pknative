@@ -1,3 +1,11 @@
-This is demo code for Korg's excellent padKontrol midi controller.
+This is demo code for Korg's excellent padKontrol midi controller, in native mode, demonstrating full control of the device.
 
 Better documentation to come. For now, see the native_demo.c file for documentation.
+
+Requiements:
+    make
+    gcc
+    libportmidi
+
+You can also build it manually with other compilers (clang will work, for example.)
+
