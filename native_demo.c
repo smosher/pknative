@@ -132,8 +132,10 @@ typedef enum {
   ButtonLightSpec_Hold
 } ButtonLightSpec;
 
+// This is used only for debugging messages sent to the device. Note: no bounds checking.
 void sysex_print(char *buf) {
   int i;
+
   printf("Sending SysEx message:");
   for(i=0;;i++) {
     if(!(i%4)) printf("\n\t");
@@ -184,8 +186,7 @@ int native_ledmsg(char abc[3], char flash, PmStream *midi) {
   return 0;
 }
 
-// note: msg must be pre-allocated
-// (this function is needlessly complicated for personal reasons)
+// note: msg is pre-allocated
 PmError read_native(PmStream *midi, char *msg) {
   PmError c;
   PmEvent buf;
@@ -193,10 +194,12 @@ PmError read_native(PmStream *midi, char *msg) {
   
   while(c=Pm_Read(midi, &buf, 1) >0) {
     if(c<0) return c;
+
 #ifdef BUGZ
     printf("buffer: 0x%08lx\n", buf.message);
 #endif
-    if(buf.message == 0x6e4042f0) header=1; // device header
+    
+    if(buf.message == 0x6e4042f0) header=1; // device header (unused result shown here for demonstration)
     if((buf.message == 0xf7) && body) { 
       complete = 1; 
       break;
@@ -214,7 +217,7 @@ PmError read_native(PmStream *midi, char *msg) {
 }
 
 void print_nativestatemsg(char *msg) {
-  printf("Native mode is now %s\n", msg[2]==0x03?"enabled":"disabled");
+  printf("Native mode is now %s\n", (msg[2] == 0x03 ? "enabled" : "disabled"));
   
   return;
 }
@@ -222,7 +225,7 @@ void print_nativestatemsg(char *msg) {
 void print_datadumpmsg(char *msg) {
   if(msg[1] == 0x00 || msg[1] == 0x01) {
     // packet comm
-    printf("Packet %hhd received, %s\n", msg[1], msg[2]?"Err":"OK");
+    printf("Packet %hhd received, %s\n", msg[1], (msg[2] ? "Err" : "OK"));
   } else {
     // data dump: not used here
     printf("Data dump with params: 0x%02hhx 0x%02hhx\n", msg[1], msg[2]);
@@ -237,9 +240,9 @@ void print_padmsg(char *msg, PmStream *midi) {
     on	= msg[1] & 0x40,
     vel	= msg[2];
   
-  if(on) native_buttonstate(pad, pad<8?ButtonState_Flash:ButtonState_FlashLong, midi);
+  if(on) native_buttonstate(pad, (pad < 8 ? ButtonState_Flash : ButtonState_FlashLong), midi);
   
-  printf("Pad #%02hhd is %s, velocity %03hhd\n", pad +1, on?"down":"up", vel);
+  printf("Pad #%02hhd is %s, velocity %03hhd\n", pad +1, (on ? "down" : "up"), vel);
   
   return;
 }
@@ -294,7 +297,7 @@ void print_facemsg(char *msg, int *lights, PmStream *midi) {
     string = FaceButtonStrings[0x13];
   }
   
-  printf("%s (%02hhx) is %s\n", string, msg[1], down?"down":"up");
+  printf("%s (%02hhx) is %s\n", string, msg[1], (down ? "down" : "up"));
   
   return;
 }
@@ -304,7 +307,7 @@ void print_knobmsg(char *msg, PmStream *midi) {
     knob  = msg[1],
     value = msg[2];
   
-  native_ledmsg(knob?"K-2":"K-1", 0, midi);
+  native_ledmsg((knob ? "K-2" : "K-1"), 0, midi);
   printf("Knob %hhd value: %03hhd\n", knob +1, value);
   
   return;
@@ -313,8 +316,8 @@ void print_knobmsg(char *msg, PmStream *midi) {
 void print_encodermsg(char *msg, PmStream *midi) {
   int dec=msg[2]>>1; // note: 0x01=inc, 0x7f=dec. rshift converts these to false, true
   
-  native_ledmsg(dec?"dec":"inc", 0, midi);
-  printf("Encoder %s\n", dec?"decrement":"increment");
+  native_ledmsg((dec ? "dec" : "inc"), 0, midi);
+  printf("Encoder %s\n", (dec ? "decrement" : "increment"));
   
   return;
 }
@@ -364,7 +367,7 @@ void poll_native(PmStream *midi_in, PmStream *midi_out) {
     
     if(c<0) return;	// error condition
     
-    switch(msg[0]&0xff) {
+    switch(msg[0] & 0xff) {
       case NativeMessage_NativeState:
         print_nativestatemsg(msg);
         break;
@@ -480,7 +483,7 @@ int main(int c, char **v) {
         break;
       }
       printf("\tDevice: #%2d (%s%s) '%s'\n",
-        devi, in->input?"input ":"", in->output?"output":"", 
+        devi, (in->input ? "input " : ""), (in->output ? "output" : ""), 
         in->name);
     }
     
@@ -490,7 +493,7 @@ int main(int c, char **v) {
   devi=atoi(v[1]);
   devo=atoi(v[2]);
   
-  Pt_Start(1,0,0);
+  Pt_Start(1, 0, 0);
   
   in=Pm_GetDeviceInfo(devi);
   out=Pm_GetDeviceInfo(devo);
@@ -514,3 +517,4 @@ int main(int c, char **v) {
   
   return 0;
 }
+
