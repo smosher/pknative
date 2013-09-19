@@ -1,4 +1,4 @@
-LIBS=-lportmidi
+LIBS=-lportmidi -lporttime
 
 all:
 	gcc -o native_demo native_demo.c $(LIBS)
