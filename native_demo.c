@@ -10,7 +10,7 @@ To build:
   Make sure the portmidi development library (eg. portmidi-dev) is
   installed, link against it:
   
-  gcc native_demo.c -o native_demo -lportmidi
+  gcc native_demo.c -o native_demo -lportmidi -lporttime
 
   This code was written and tested on Linux, but it should be portable.
 
